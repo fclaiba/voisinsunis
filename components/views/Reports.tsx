@@ -311,14 +311,14 @@ const normalizeDataset = (raw: ReportDataset | undefined): ReportDataset => {
 
   const rows = Array.isArray(raw.rows)
     ? raw.rows.map((row) => {
-        if (!row || typeof row !== "object") {
-          return {};
-        }
-        return Object.entries(row).reduce<Record<string, string | number>>((acc, [key, value]) => {
-          acc[String(key)] = typeof value === "number" ? value : String(value ?? "");
-          return acc;
-        }, {});
-      })
+      if (!row || typeof row !== "object") {
+        return {};
+      }
+      return Object.entries(row).reduce<Record<string, string | number>>((acc, [key, value]) => {
+        acc[String(key)] = typeof value === "number" ? value : String(value ?? "");
+        return acc;
+      }, {});
+    })
     : [];
 
   let columns = Array.isArray(raw.columns) ? raw.columns.map((column) => String(column)) : [];
@@ -334,8 +334,8 @@ const normalizeDataset = (raw: ReportDataset | undefined): ReportDataset => {
     rows,
     summary: Array.isArray(raw.summary)
       ? raw.summary
-          .filter((item): item is DatasetSummaryItem => Boolean(item?.label) && Boolean(item?.value))
-          .map((item) => ({ label: String(item.label), value: String(item.value) }))
+        .filter((item): item is DatasetSummaryItem => Boolean(item?.label) && Boolean(item?.value))
+        .map((item) => ({ label: String(item.label), value: String(item.value) }))
       : undefined,
   };
 };
@@ -455,7 +455,8 @@ const downloadCSV = (dataset: ReportDataset, filename: string) => {
   });
 
   const csvContent = rows.join("\r\n");
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  // Add BOM for Excel compatibility
+  const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -496,11 +497,10 @@ const downloadDoc = (dataset: ReportDataset, filename: string) => {
       <body>
         <h1>${dataset.title}</h1>
         ${dataset.subtitle ? `<h2>${dataset.subtitle}</h2>` : ""}
-        ${
-          dataset.summary?.length
-            ? `<section><h3>Resumen</h3><ul>${summary}</ul></section>`
-            : ""
-        }
+        ${dataset.summary?.length
+      ? `<section><h3>Resumen</h3><ul>${summary}</ul></section>`
+      : ""
+    }
         <table>
           <thead>
             <tr>${dataset.columns.map((column) => `<th>${column}</th>`).join("")}</tr>
@@ -564,11 +564,10 @@ const openPrintPreview = (dataset: ReportDataset): boolean => {
       <body>
         <h1>${dataset.title}</h1>
         ${dataset.subtitle ? `<h2>${dataset.subtitle}</h2>` : ""}
-        ${
-          dataset.summary?.length
-            ? `<section><h3>Resumen</h3><ul>${summary}</ul></section>`
-            : ""
-        }
+        ${dataset.summary?.length
+      ? `<section><h3>Resumen</h3><ul>${summary}</ul></section>`
+      : ""
+    }
         <table>
           <thead>
             <tr>${dataset.columns.map((column) => `<th>${column}</th>`).join("")}</tr>
