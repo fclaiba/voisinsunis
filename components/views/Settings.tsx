@@ -329,7 +329,7 @@ export function Settings() {
       <Card className="border-border bg-gradient-to-br from-muted/60 to-muted/40 p-4 sm:p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="mb-1 text-sm text-muted-foreground">Voisins Unis</p>
+            <p className="mb-1 text-sm text-muted-foreground">CIML</p>
             <p className="text-xs text-muted-foreground">Versión 2.5.1 • Actualizado el 10 de Noviembre 2024</p>
           </div>
           <Badge variant="secondary" className="bg-emerald-500/15 text-emerald-500">Última versión</Badge>

@@ -15,66 +15,48 @@ import {
 interface HeaderProps {
   onMenuClick?: () => void;
   searchQuery?: string;
-  onSearchChange?: (value: string) => void;
-  onSearchSubmit?: (value: string) => void;
+  onSearchChange?: (query: string) => void;
+  onSearchSubmit?: (query: string) => void;
+  onLogout?: () => void;
 }
 
 export function Header({
   onMenuClick,
-  searchQuery = "",
+  searchQuery,
   onSearchChange,
   onSearchSubmit,
+  onLogout,
 }: HeaderProps) {
-  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
-  const [profileDialogTab, setProfileDialogTab] =
-    useState<"profile" | "preferences">("profile");
-  const [profileData, setProfileData] = useState<ProfileData>({
-    name: "Ana Rodríguez",
-    role: "Coordinadora",
-    email: "ana.rodriguez@territorial.com",
-    phone: "+54 11 4567 8901",
-    organization: "Voisins Unis",
-    location: "Buenos Aires, Argentina",
-    bio: "Coordinadora general con experiencia en programas comunitarios y acompañamiento familiar.",
-    status: "En línea",
-    availability: "Disponible de lunes a viernes de 9 a 18 hs. Coordinación presencial los martes.",
-  });
-  const [preferencesData, setPreferencesData] = useState<PreferenceData>({
-    language: "es-AR",
-    timezone: "America/Argentina/Buenos_Aires",
-    weeklySummary: true,
-    productUpdates: false,
-    smsAlerts: false,
-    desktopNotifications: true,
-    autoAssignFamilies: true,
-    showGuidedTips: true,
-    themePreference: "system",
-    defaultReportFormat: "pdf",
-    dataSharing: true,
-    digestFrequency: "weekly",
-  });
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [profileDialogTab, setProfileDialogTab] = useState<"profile" | "preferences">("profile");
+
+  const [profileData, setProfileData] = useState<ProfileData>({
+    name: "Admin Usuario",
+    email: "usuario@correo.com",
+    role: "Administrador",
+    status: "Activo",
+    phone: "+54 11 1234-5678",
+    location: "Buenos Aires, Argentina",
+    bio: "Administrador del sistema de censo y análisis de datos.",
+  });
+
+  const [preferencesData, setPreferencesData] = useState<PreferenceData>({
+    theme: "light",
+    emailNotifications: true,
+    pushNotifications: false,
+    language: "es",
+    autoSave: true,
+    compactMode: false,
+  });
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (!(event.ctrlKey || event.metaKey)) {
-        return;
-      }
-
       const key = event.key.toLowerCase();
-      if (key !== "k") {
-        return;
+      if (key === "k" && (event.ctrlKey || event.metaKey)) {
+        event.preventDefault();
+        searchInputRef.current?.focus();
       }
-
-      event.preventDefault();
-
-      const input = searchInputRef.current;
-      if (!input) {
-        return;
-      }
-
-      input.focus();
-      input.select();
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -96,8 +78,9 @@ export function Header({
     setProfileDialogOpen(true);
   };
 
-  const handleLogout = () => {
-    console.info("Cerrar sesión solicitado");
+  const handleLogoutClick = () => {
+    setProfileDialogOpen(false);
+    onLogout?.();
   };
 
   return (
@@ -139,7 +122,7 @@ export function Header({
               </kbd>
             </div>
           </div>
-          
+
           {/* Mobile Search Icon */}
           <Button variant="ghost" size="icon" className="ml-auto md:hidden">
             <Search className="size-5 text-muted-foreground" />
@@ -223,7 +206,7 @@ export function Header({
         onSavePreferences={(updatedPreferences) => {
           setPreferencesData(updatedPreferences);
         }}
-        onLogout={handleLogout}
+        onLogout={handleLogoutClick}
       />
     </header>
   );

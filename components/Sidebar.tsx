@@ -24,7 +24,7 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
             <Users className="size-6 text-white" />
           </div>
           <div>
-            <h2 className="font-semibold text-sidebar-foreground">Voisins Unis</h2>
+            <h2 className="font-semibold text-sidebar-foreground">CIML</h2>
             <p className="text-xs text-muted-foreground">Gestión Comunitaria</p>
           </div>
         </div>
@@ -54,11 +54,11 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
                 {isActive && (
                   <div className="absolute inset-0 blur-xl bg-sidebar-primary/30"></div>
                 )}
-                
+
                 <div className="relative z-10 flex items-center gap-3">
                   <div className={cn(
                     "rounded-lg p-2 transition-all duration-300",
-                    isActive 
+                    isActive
                       ? "bg-sidebar text-sidebar-primary-foreground ring-1 ring-sidebar-ring"
                       : "bg-muted text-muted-foreground ring-1 ring-transparent group-hover:ring-sidebar-ring"
                   )}>
@@ -66,11 +66,11 @@ export function Sidebar({ activeSection, onSectionChange }: SidebarProps) {
                   </div>
                   <span className="font-medium">{item.label}</span>
                 </div>
-                
+
                 <ChevronRight className={cn(
                   "relative z-10 size-4 transition-all duration-300",
-                  isActive 
-                    ? "translate-x-0 opacity-100" 
+                  isActive
+                    ? "translate-x-0 opacity-100"
                     : "-translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
                 )} />
               </button>

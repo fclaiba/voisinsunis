@@ -10,6 +10,8 @@ import { Reports } from "./components/views/Reports";
 import { Analytics } from "./components/views/Analytics";
 import { Settings } from "./components/views/Settings";
 import { MetricsFilterControls } from "./components/MetricsFilterControls";
+import { WelcomePage } from "./components/views/WelcomePage";
+import { AuthPage } from "./components/views/AuthPage";
 import { Family, FilterState, SelectionType } from "./types/family";
 import { mockFamilies } from "./data/mockData";
 import {
@@ -22,12 +24,34 @@ import {
 import { NotificationsProvider } from "./components/NotificationsProvider";
 import { Toaster } from "sonner";
 
+type AppView = "welcome" | "login" | "register" | "app";
+
 export default function App() {
+  // Navigation State
+  const [currentView, setCurrentView] = useState<AppView>("welcome");
+  const [currentUser, setCurrentUser] = useState<string>("Ana Rodríguez"); // Default user
+
+  // App State
   const [activeSection, setActiveSection] = useState("dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [families, setFamilies] = useState<Family[]>(mockFamilies);
   const [filters, setFilters] = useState<FilterState>(initialFilterState);
 
+  // Auth Handlers
+  const handleLogin = (email: string) => {
+    // Extract username from email (e.g., "pepito123" from "pepito123@email.com")
+    const username = email.includes("@") ? email.split("@")[0] : email;
+    setCurrentUser(username);
+    setCurrentView("app");
+  };
+
+  const handleLogout = () => {
+    setCurrentView("welcome");
+    setActiveSection("dashboard");
+    setCurrentUser("Ana Rodríguez"); // Reset to default or clear
+  };
+
+  // Filter Handlers
   const updateFilters = (updater: FilterState | ((prev: FilterState) => FilterState)) => {
     setFilters((prev) => {
       const nextState = typeof updater === "function" ? updater(prev) : updater;
@@ -65,13 +89,13 @@ export default function App() {
       // Búsqueda general
       if (filters.busqueda) {
         const searchTerm = filters.busqueda.toLowerCase();
-        const matchesSearch = 
+        const matchesSearch =
           family.nombreApellido.toLowerCase().includes(searchTerm) ||
           family.dni.toLowerCase().includes(searchTerm) ||
           family.telefono.toLowerCase().includes(searchTerm) ||
           family.direccion.toLowerCase().includes(searchTerm) ||
           family.barrio.toLowerCase().includes(searchTerm);
-        
+
         if (!matchesSearch) return false;
       }
 
@@ -112,10 +136,10 @@ export default function App() {
         if (filters.nivelEstudios === "universitario-cursando" && family.estudios.universitario !== "cursando") return false;
         if (filters.nivelEstudios === "secundaria-completa" && family.estudios.secundaria !== "completo") return false;
         if (filters.nivelEstudios === "primaria-completa" && family.estudios.primaria !== "completo") return false;
-        if (filters.nivelEstudios === "sin-estudios" && 
-            (family.estudios.primaria === "completo" || 
-             family.estudios.secundaria === "completo" || 
-             family.estudios.universitario === "completo")) return false;
+        if (filters.nivelEstudios === "sin-estudios" &&
+          (family.estudios.primaria === "completo" ||
+            family.estudios.secundaria === "completo" ||
+            family.estudios.universitario === "completo")) return false;
       }
 
       // Filtro: Oficio
@@ -290,6 +314,22 @@ export default function App() {
     }
   };
 
+  // Conditional Rendering based on View State
+  if (currentView === "welcome") {
+    return <WelcomePage onNavigate={(page) => setCurrentView(page)} />;
+  }
+
+  if (currentView === "login" || currentView === "register") {
+    return (
+      <AuthPage
+        initialMode={currentView}
+        onLogin={handleLogin}
+        onBack={() => setCurrentView("welcome")}
+      />
+    );
+  }
+
+  // Main Authenticated App
   return (
     <NotificationsProvider>
       <div className="flex min-h-screen bg-background text-foreground transition-colors">
@@ -317,6 +357,8 @@ export default function App() {
             searchQuery={filters.busqueda}
             onSearchChange={handleSearchChange}
             onSearchSubmit={handleSearchSubmit}
+            currentUser={currentUser}
+            onLogout={handleLogout}
           />
 
           {/* Content Area */}
